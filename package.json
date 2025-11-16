@@ -1,0 +1,15 @@
+{
+  "name": "ci-cd-demo-161125",
+  "version": "1.0.0",
+  "description": "Small Node.js app for CI/CD demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --coverage"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
