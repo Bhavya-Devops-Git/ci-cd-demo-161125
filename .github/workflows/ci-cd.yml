@@ -10,12 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Debug: show node & npm versions and file listing
         run: |
           echo "=== PATH ==="
-          echo $PATH
+          echo "$PATH"
           echo
           echo "=== node & npm versions ==="
           node -v || echo "node not found"
@@ -27,9 +28,11 @@ jobs:
           echo "=== package.json content ==="
           sed -n '1,200p' package.json || echo "package.json not found"
           echo
+
       - name: Install dependencies (with verbose)
         run: |
           npm ci --prefer-offline --no-audit --progress=false || { echo "npm ci failed"; ls -la node_modules || true; exit 1; }
+
       - name: Show installed test runner and node_modules bin
         run: |
           echo "=== node_modules/.bin listing ==="
@@ -37,6 +40,7 @@ jobs:
           echo
           echo "=== which jest (if present) ==="
           which jest || echo "jest not found in PATH"
+
       - name: Run tests (verbose)
         run: |
           set -x
@@ -47,16 +51,21 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push image
         uses: docker/build-push-action@v4
         with:
