@@ -1,0 +1,23 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  imageName: 'ci-cd-demo'
+  tag: '$(Build.BuildId)'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- checkout: self
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+
+- script: |
+    npm ci
+    npm test
+  displayName: 'Install & test'
