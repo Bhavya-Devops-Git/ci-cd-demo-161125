@@ -11,14 +11,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm test --silent
+
+      - name: Debug: show node & npm versions and file listing
+        run: |
+          echo "=== PATH ==="
+          echo $PATH
+          echo
+          echo "=== node & npm versions ==="
+          node -v || echo "node not found"
+          npm -v || echo "npm not found"
+          echo
+          echo "=== repo root listing ==="
+          ls -la
+          echo
+          echo "=== package.json content ==="
+          sed -n '1,200p' package.json || echo "package.json not found"
+          echo
+      - name: Install dependencies (with verbose)
+        run: |
+          npm ci --prefer-offline --no-audit --progress=false || { echo "npm ci failed"; ls -la node_modules || true; exit 1; }
+      - name: Show installed test runner and node_modules bin
+        run: |
+          echo "=== node_modules/.bin listing ==="
+          ls -la node_modules/.bin || echo "no node_modules/.bin (maybe no devDependencies installed)"
+          echo
+          echo "=== which jest (if present) ==="
+          which jest || echo "jest not found in PATH"
+      - name: Run tests (verbose)
+        run: |
+          set -x
+          npm test --silent
+          set +x
 
   build-and-push:
     needs: test
